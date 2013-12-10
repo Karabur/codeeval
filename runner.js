@@ -2,23 +2,27 @@
 
 var fs = require('fs'),
     path = require('path'),
-    clc = require('cli-color');
+    clc = require('cli-color'),
+    sh = require('exec-sync');
 
 var good = clc.green,
     bad = clc.red,
     cyan = clc.cyan;
 
+/** @const*/ var TMP = 'tmp-input';
+
 runSuite();
 
 //init watchers
 var watcher = fs.watch('.');
-watcher.on('change', listener);
+watcher.on('change', listener.bind(null, false));
 var testWatcher = fs.watch('./tests');
-testWatcher.on('change', listener);
+testWatcher.on('change', listener.bind(null, true));
 console.log('Watching for changes...');
 
-function listener(e, filename) {
-    if (e !== 'change') return;
+function listener(forced, e, filename) {
+    if (e !== 'change' || filename == TMP) return;
+    if (!forced && path.extname(filename) !== '.js') return;
     console.log('Change detected in ' + filename, e);
     runSuite();
 }
@@ -33,19 +37,36 @@ function runSuite() {
 
         return {
             name: test,
-            input: testContent[0],
-            output: testContent[1]
+            input: testContent[0] || '',
+            output: testContent[1] || ''
         }
     });
 
     console.log('Tests found:' + good(tests.length));
-    var fails = [];
+    var fails = tests.filter(function (test) {
+        return !runTest(solver, test);
+    });
 
     console.log('Tests failed:' + bad(fails.length));
     if (!fails.length) {
         console.log(good('All tests passed'));
     } else {
         console.log(bad('Testing failed.'));
-        console.log(bad('Failed tests: '+ fails.join(', ')));
+        console.log(bad('Failed tests:\n' + fails.map(function (test) { return test.name }).join('\n')));
     }
+}
+
+/** returns true if test passed */
+function runTest(solver, test) {
+    fs.writeFileSync('./' + TMP, test.input);
+    var result = sh('node ' + solver + ' tmp-input');
+    console.log('"' + result + '"');
+    fs.unlinkSync('./' + TMP);
+
+    return compareResult(test.output, result);
+
+}
+
+function compareResult(expect, actual) {
+    return expect.trim() == actual.trim();
 }
