@@ -64,7 +64,6 @@ function runTest(solver, test) {
     fs.writeFileSync(baseDir + TMP, test.input);
     try {
         var result = sh('node ' + baseDir + solver + ' ' + baseDir + TMP);
-        console.log('"' + result + '"');
         fs.unlinkSync(baseDir + TMP);
 
         return compareResult(test.output, result);
