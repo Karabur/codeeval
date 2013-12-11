@@ -11,7 +11,7 @@ var good = clc.green,
 
 /** @const*/ var TMP = 'tmp-input';
 
-var baseDir = path.normalize(process.argv[2]+'/');
+var baseDir = path.normalize(process.argv[2] + '/');
 var testsDir = path.normalize(baseDir + '/tests/');
 
 runSuite();
@@ -63,7 +63,7 @@ function runSuite() {
 function runTest(solver, test) {
     fs.writeFileSync(baseDir + TMP, test.input);
     try {
-        var result = sh('node ' + baseDir+solver + ' tmp-input');
+        var result = sh('node ' + baseDir + solver + ' ' + baseDir + TMP);
         console.log('"' + result + '"');
         fs.unlinkSync(baseDir + TMP);
 

@@ -9,5 +9,19 @@ var input = (function () {
 })();
 
 function out(res) { util.print(res)}
+function outLine(res) { out(res + '\n')}
 
-out('1 2 3');
+input.split('\n').forEach(solve);
+
+function solve(line) {
+    line = line.split(' ');
+    var a = line[0], b = line[1], n = line[2];
+    var res = [];
+    for (var i = 1; i <= n; i++) {
+        var el = '';
+        if (i % a === 0) el = 'F';
+        if (i % b === 0) el += 'B';
+        res.push(el || i)
+    }
+    outLine(res.join(' '));
+}
