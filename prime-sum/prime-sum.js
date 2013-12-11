@@ -5,26 +5,11 @@ var util = require('util');
 function out(res) { util.print(res)}
 function outLine(res) { out(res + '\n')}
 
-//just output answer - it is how it should be done in real contests
-//but we have fair solver also.
-if (process.argv.length == 3) {solve()}
-else {outLine(929)}
-
-
-function isPalindrome(n) {
-    n = n.toFixed(0);
-    var i = 0, j = n.length - 1;
-    while (i < j) {
-        if (n[i] !== n[j]) return false;
-        ++i;
-        --j;
-    }
-    return true;
-}
+solve();
 
 function genPrimes(max) {
     //the silliest sieve of Eratosthenes implementation
-    var res = Array.apply(Array, new Array(max+1)).map(function (el, idx) {return idx});
+    var res = Array.apply(Array, new Array(max + 1)).map(function (el, idx) {return idx});
     var cur = 2;
     while (cur < res.length / 2 + 1) {
         if (res[cur] !== null) {
@@ -40,11 +25,13 @@ function genPrimes(max) {
 
 function solve() {
     var primes = genPrimes(1000);
-    var i = primes.length;
-    while (--i > 0) {
-        if (isPalindrome(primes[i])) {
-            outLine(primes[i]);
-            break;
+    var i = primes[primes.length - 1];
+    while (primes.length < 1000) {
+        var composite = false;
+        for (var j = 0; j < primes.length; j++) {
+            if (i % primes[j] === 0) { composite = true;}
+
         }
     }
 }
+
