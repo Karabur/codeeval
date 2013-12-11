@@ -62,6 +62,7 @@ function runTest(solver, test) {
     try {
         var result = sh('node ' + baseDir + solver + ' ' + TMP);
         fs.unlinkSync(TMP);
+        console.log('"' + result + '"');
 
         return compareResult(test.output, result);
     } catch (e) {
