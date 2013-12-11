@@ -11,12 +11,15 @@ var good = clc.green,
 
 /** @const*/ var TMP = 'tmp-input';
 
+var baseDir = path.normalize(process.argv[2]+'/');
+var testsDir = path.normalize(baseDir + '/tests/');
+
 runSuite();
 
 //init watchers
 var watcher = fs.watch('.');
 watcher.on('change', listener.bind(null, false));
-var testWatcher = fs.watch('./tests');
+var testWatcher = fs.watch(testsDir);
 testWatcher.on('change', listener.bind(null, true));
 console.log('Watching for changes...');
 
@@ -29,11 +32,11 @@ function listener(forced, e, filename) {
 
 function runSuite() {
     console.log(cyan('=== Running test suite ==='));
-    var solver = fs.readdirSync('.').filter(function (file) { return path.extname(file) === '.js'})[0];
+    var solver = fs.readdirSync(baseDir).filter(function (file) { return path.extname(file) === '.js'})[0];
     console.log('Solver assumed: ' + good(solver));
 
-    var tests = fs.readdirSync('tests').map(function (test) {
-        var testContent = fs.readFileSync('tests/' + test, {encoding: 'utf8'}).split('####\n');
+    var tests = fs.readdirSync(testsDir).map(function (test) {
+        var testContent = fs.readFileSync(testsDir + '/' + test, {encoding: 'utf8'}).split('####\n');
 
         return {
             name: test,
@@ -58,11 +61,11 @@ function runSuite() {
 
 /** returns true if test passed */
 function runTest(solver, test) {
-    fs.writeFileSync('./' + TMP, test.input);
+    fs.writeFileSync(baseDir + TMP, test.input);
     try {
-        var result = sh('node ' + solver + ' tmp-input');
+        var result = sh('node ' + baseDir+solver + ' tmp-input');
         console.log('"' + result + '"');
-        fs.unlinkSync('./' + TMP);
+        fs.unlinkSync(baseDir + TMP);
 
         return compareResult(test.output, result);
     } catch (e) {
