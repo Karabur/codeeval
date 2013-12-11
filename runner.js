@@ -59,12 +59,16 @@ function runSuite() {
 /** returns true if test passed */
 function runTest(solver, test) {
     fs.writeFileSync('./' + TMP, test.input);
-    var result = sh('node ' + solver + ' tmp-input');
-    console.log('"' + result + '"');
-    fs.unlinkSync('./' + TMP);
+    try {
+        var result = sh('node ' + solver + ' tmp-input');
+        console.log('"' + result + '"');
+        fs.unlinkSync('./' + TMP);
 
-    return compareResult(test.output, result);
-
+        return compareResult(test.output, result);
+    } catch (e) {
+        console.log(bad('Error executing solver:' + e));
+    }
+    return false;
 }
 
 function compareResult(expect, actual) {
